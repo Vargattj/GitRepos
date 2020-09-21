@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from 'react';
+import React, { useState, FormEvent, useEffect } from 'react';
 import api from '../../services/api';
 
 import logoImg from '../../assets/images/logo.svg';
@@ -17,7 +17,24 @@ interface Repository {
 const Dashboard: React.FC = () => {
   const [newRepo, setNewRepo] = useState('');
   const [inputError, setInputError] = useState('');
-  const [repositories, setRepositories] = useState<Repository[]>([]);
+
+  const [repositories, setRepositories] = useState<Repository[]>(() => {
+    const storagedRepositories = localStorage.getItem(
+      '@GitHubExplorer:repositories',
+    );
+    if (storagedRepositories) {
+      return JSON.parse(storagedRepositories);
+    } else {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(
+      '@GitHubExplorer:repositories',
+      JSON.stringify(repositories),
+    );
+  }, [repositories]);
 
   async function handleAddRepository(
     e: FormEvent<HTMLFormElement>,
@@ -39,6 +56,7 @@ const Dashboard: React.FC = () => {
       setInputError('Digite o autor/nome do repositório');
     }
   }
+
   return (
     <>
       (
